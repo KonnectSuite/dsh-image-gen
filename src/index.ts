@@ -234,7 +234,7 @@ export function apply(ctx: Context, config: Config = {}): void {
   const generateSingle = async (args: SingleGenerationArgs, exec: { agent?: { session: { header: { cwd?: string } } }; signal: AbortSignal }): Promise<GeneratedValue> => {
     const active = resolveProvider(withProviderOverrides(current(), providerOverrideOf(args.provider), args.model))
     if (active.provider === 'comfyui') {
-      const workflow = selectComfyUIWorkflow(active, args.workflow)
+      const workflow = selectComfyUIWorkflow(active, args.workflow, 'generate')
       const generated = await generateComfyUIImage({
         baseURL: active.baseURL,
         workflowJson: workflow.json,
@@ -292,7 +292,7 @@ export function apply(ctx: Context, config: Config = {}): void {
       aspect_ratio: { type: 'string', enum: ['1:1', '3:2', '2:3', '4:3', '3:4', '4:5', '5:4', '16:9', '9:16', '21:9'], description: 'Optional output aspect ratio for Google Gemini, xAI Grok, and subscription channels.' },
       image_size: { type: 'string', enum: ['1K', '2K', '4K'], description: 'Optional output resolution for Google Gemini, xAI Grok, Grok subscription (1K/2K), or Google subscription (1K/4K).' },
       size: { type: 'string', description: 'Optional dimensions or size tier for OpenAI, Seedream, or DashScope; WIDTHxHEIGHT maps to aspect_ratio for xAI Grok.' },
-      workflow: { type: 'string', description: 'Optional name of the ComfyUI workflow to run; omit to use the active workflow from settings. Only meaningful when the ComfyUI provider is selected.' },
+      workflow: { type: 'string', description: 'Optional name of the ComfyUI workflow to run; omit to automatically select a compatible workflow (preferring the active one). Only meaningful when the ComfyUI provider is selected.' },
     },
     output: imageOutput('Generated'),
     async execute(args, exec): Promise<GeneratedValue> {
@@ -311,7 +311,7 @@ export function apply(ctx: Context, config: Config = {}): void {
       aspect_ratio: { type: 'string', enum: ['1:1', '3:2', '2:3', '4:3', '3:4', '4:5', '5:4', '16:9', '9:16', '21:9'], description: 'Optional output aspect ratio for Google Gemini, xAI Grok, and subscription channels.' },
       image_size: { type: 'string', enum: ['1K', '2K', '4K'], description: 'Optional output resolution for Google Gemini, xAI Grok, Grok subscription (1K/2K), or Google subscription (1K/4K).' },
       size: { type: 'string', description: 'Optional dimensions or size tier for OpenAI, Seedream, or DashScope; WIDTHxHEIGHT maps to aspect_ratio for xAI Grok.' },
-      workflow: { type: 'string', description: 'Optional name of the ComfyUI workflow to run; omit to use the active workflow from settings.' },
+      workflow: { type: 'string', description: 'Optional name of the ComfyUI workflow to run; omit to automatically select a compatible workflow (preferring the active one).' },
     },
     output: {
       schema: {
@@ -385,7 +385,7 @@ export function apply(ctx: Context, config: Config = {}): void {
       aspect_ratio: { type: 'string', enum: ['1:1', '3:2', '2:3', '4:3', '3:4', '4:5', '5:4', '16:9', '9:16', '21:9'], description: 'Optional output aspect ratio for Google Gemini, xAI Grok, and subscription channels.' },
       image_size: { type: 'string', enum: ['1K', '2K', '4K'], description: 'Optional output resolution for Google Gemini, xAI Grok, Grok subscription (1K/2K), or Google subscription (1K/4K).' },
       size: { type: 'string', description: 'Optional output size for OpenAI, Seedream, or DashScope; WIDTHxHEIGHT maps to aspect_ratio for xAI Grok.' },
-      workflow: { type: 'string', description: 'Optional name of the ComfyUI workflow to run; omit to use the active workflow from settings. Only meaningful when the ComfyUI provider is selected.' },
+      workflow: { type: 'string', description: 'Optional name of the ComfyUI workflow to run; omit to automatically select a compatible workflow (preferring the active one). Only meaningful when the ComfyUI provider is selected.' },
     },
     output: imageOutput('Edited'),
     async execute(args, exec): Promise<GeneratedValue> {
@@ -424,7 +424,7 @@ export function apply(ctx: Context, config: Config = {}): void {
         }
         const sourceImage = sourceImages[0]
         if (sourceImage === undefined) throw new Error('edit_image requires a reference image')
-        const workflow = selectComfyUIWorkflow(active, args.workflow)
+        const workflow = selectComfyUIWorkflow(active, args.workflow, 'edit')
         const generated = await editComfyUIImage({
           baseURL: active.baseURL,
           workflowJson: workflow.json,

@@ -24,6 +24,12 @@ export function validateComfyUIWorkflowJson(workflowJson: string): void {
   }
 }
 
+/** Return whether a validated API workflow accepts one reference image. */
+export function comfyUIWorkflowAcceptsImage(workflowJson: string): boolean {
+  validateComfyUIWorkflowJson(workflowJson)
+  return countImagePlaceholders(parseWorkflow(workflowJson)) === 1
+}
+
 /**
  * Parse, clone, and inject one prompt plus an optional randomized seed.
  *

@@ -361,11 +361,11 @@ describe('image tool registration', () => {
       .mockResolvedValueOnce(new Response(new Uint8Array([7, 8, 9]), { status: 200, headers: { 'content-type': 'image/png' } })))
     apply(ctx, {
       provider: 'comfyui',
-      comfyuiWorkflowJson: JSON.stringify({
+      comfyuiWorkflows: [{ name: 'txt2img.json', json: JSON.stringify({ 6: { class_type: 'CLIPTextEncode', inputs: { text: '{{prompt}}' } } }) }, { name: 'img2img.json', json: JSON.stringify({
         1: { class_type: 'LoadImage', inputs: { image: '{{image}}' } },
         6: { class_type: 'CLIPTextEncode', inputs: { text: '{{prompt}}' } },
-      }),
-      comfyuiWorkflowName: 'img2img.json',
+      }) }],
+      comfyuiActiveWorkflow: 'txt2img.json',
       saveToWorkspace: false,
     })
 

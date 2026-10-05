@@ -370,3 +370,20 @@ describe('Config Schema validation', () => {
     expect(validated.comfyuiActiveWorkflow).toBe('a.json')
   })
 })
+
+describe('operation-aware ComfyUI defaults', () => {
+  const generate = { name: 'generate', json: JSON.stringify({ 1: { class_type: 'CLIPTextEncode', inputs: { text: '{{prompt}}' } } }) }
+  const edit = { name: 'edit', json: JSON.stringify({ 1: { class_type: 'LoadImage', inputs: { image: '{{image}}' } }, 2: { class_type: 'CLIPTextEncode', inputs: { text: '{{prompt}}' } } }) }
+  it('selects editing automatically without changing the generation default', () => {
+    const active = { workflows: [generate, edit], workflow: generate }
+    expect(selectComfyUIWorkflow(active, undefined, 'edit')).toBe(edit)
+    expect(selectComfyUIWorkflow(active, undefined, 'generate')).toBe(generate)
+  })
+  it('selects generation when the active workflow accepts a reference', () => {
+    expect(selectComfyUIWorkflow({ workflows: [generate, edit], workflow: edit }, undefined, 'generate')).toBe(generate)
+  })
+  it('honors explicit names and explains missing edit support', () => {
+    expect(selectComfyUIWorkflow({ workflows: [generate, edit], workflow: generate }, 'generate', 'edit')).toBe(generate)
+    expect(() => selectComfyUIWorkflow({ workflows: [generate], workflow: generate }, undefined, 'edit')).toThrow('No reference-image workflow')
+  })
+})

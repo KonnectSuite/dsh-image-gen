@@ -1,5 +1,6 @@
 /** User-facing configuration for supported image providers. */
 import z from '@deepseek-ai/schemastery'
+import { comfyUIWorkflowAcceptsImage } from './comfyui-workflow.js'
 
 import {
   ARK_BACKGROUND_MODES,
@@ -330,15 +331,25 @@ function hostOf(raw: string): string | null {
   }
 }
 
-/** The workflow a ComfyUI call runs: the requested name when given, else the active one. */
+/** Explicit names are honored; automatic selection prefers the active compatible workflow, then import order. */
 export function selectComfyUIWorkflow(
   active: { workflows: ComfyUIWorkflowEntry[]; workflow?: ComfyUIWorkflowEntry },
   requested?: string,
+  operation?: 'generate' | 'edit',
 ): ComfyUIWorkflowEntry {
   if (active.workflow === undefined) {
     throw new Error('ComfyUI image generation requires an imported workflow; import one in Settings > Plugins > Image generation.')
   }
-  if (typeof requested !== 'string' || requested.trim().length === 0) return active.workflow
+  if (typeof requested !== 'string' || requested.trim().length === 0) {
+    if (operation === undefined) return active.workflow
+    const compatible = (entry: ComfyUIWorkflowEntry): boolean => comfyUIWorkflowAcceptsImage(entry.json) === (operation === 'edit')
+    if (compatible(active.workflow)) return active.workflow
+    const fallback = active.workflows.find(compatible)
+    if (fallback !== undefined) return fallback
+    throw new Error(operation === 'edit'
+      ? 'No reference-image workflow is configured. Import an API workflow with exactly one {{image}} input for editing.'
+      : 'No text-to-image workflow is configured. Import an API workflow without an {{image}} input for generation.')
+  }
   const name = requested.trim()
   const workflow = active.workflows.find(candidate => candidate.name === name)
   if (workflow === undefined) {

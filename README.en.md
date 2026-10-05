@@ -416,3 +416,5 @@ If `dsh-image-gen` improves your workflow, consider giving the project a ⭐ **S
 **[View Releases](https://github.com/shanliuling/dsh-image-gen/releases) · [Open an Issue](https://github.com/shanliuling/dsh-image-gen/issues) · [Contribute](CONTRIBUTING.md)**
 
 </div>
+
+ComfyUI chat automatically selects a workflow compatible with the operation. New images use a workflow without a reference-image input; edits use one with exactly one `{{image}}` input. The active compatible workflow takes priority, followed by import order. Explicit workflow names remain authoritative.

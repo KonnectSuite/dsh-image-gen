@@ -416,3 +416,5 @@ pnpm run pack:check
 **[查看 Releases](https://github.com/shanliuling/dsh-image-gen/releases) · [提交 Issue](https://github.com/shanliuling/dsh-image-gen/issues) · [参与贡献](CONTRIBUTING.md)**
 
 </div>
+
+ComfyUI 聊天会按操作自动选择兼容的工作流：生成新图使用不带参考图输入的工作流，编辑使用包含一个 `{{image}}` 输入的工作流。优先使用兼容的当前工作流，其次按导入顺序选择；明确指定的工作流名称仍优先。
