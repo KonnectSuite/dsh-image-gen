@@ -48,12 +48,17 @@ export async function editComfyUIImage(input: ComfyUIJobInput & {
   workflowJson: string
   prompt: string
   sourceImage: ComfyUISourceImage
+  /** Ordered complete reference list; takes priority over the single-image compatibility field. */
+  sourceImages?: readonly ComfyUISourceImage[]
   maxBytes: number
 }): Promise<GeneratedComfyUIImage> {
   const seed = randomSeed()
+  prepareComfyUIWorkflow(input.workflowJson, input.prompt, seed, (input.sourceImages ?? [input.sourceImage]).map((_image, index) => `reference-${index + 1}`))
   const output = await runJob(input, async (baseURL, signal) => {
-    const imageName = await uploadSourceImage(baseURL, input.sourceImage, signal)
-    const workflow = prepareComfyUIWorkflow(input.workflowJson, input.prompt, seed, imageName)
+    const images = input.sourceImages ?? [input.sourceImage]
+    const names: string[] = []
+    for (const image of images) names.push(await uploadSourceImage(baseURL, image, signal))
+    const workflow = prepareComfyUIWorkflow(input.workflowJson, input.prompt, seed, names)
     const promptId = await submitWorkflow(baseURL, workflow, signal)
     const result = await waitForOutput(baseURL, promptId, signal)
     return await downloadOutput(baseURL, result, input.maxBytes, signal)

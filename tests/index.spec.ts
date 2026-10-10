@@ -379,7 +379,7 @@ describe('image tool registration', () => {
     expect(ctx.credentials.resolve).not.toHaveBeenCalled()
   })
 
-  it('rejects ComfyUI editing of several images with a selector hint', async () => {
+  it('requires a configured edit workflow before uploading multiple references', async () => {
     const { ctx, tools } = harnessContext()
     vi.mocked(ctx.attachments.readImage).mockResolvedValue({
       ref: { mediaType: 'image/png', attachmentId: 'sha256:a' as ImageAttachmentRef['attachmentId'], bytes: 1, width: 2, height: 2 },
@@ -392,7 +392,7 @@ describe('image tool registration', () => {
     await expect(toolByName(tools, 'edit_image').execute(
       { prompt: 'restyle it' },
       execWithUserImages('sha256:a', 'sha256:b'),
-    )).rejects.toThrow('exactly one source image')
+    )).rejects.toThrow('requires an imported workflow')
     expect(fetchMock).not.toHaveBeenCalled()
     expect(ctx.credentials.resolve).not.toHaveBeenCalled()
   })

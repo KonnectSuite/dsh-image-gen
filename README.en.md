@@ -278,7 +278,7 @@ Bring private image generation on your local GPU directly into Agent conversatio
 | **Aliyun DashScope / Qwen Image** | ✅ | ✅ Multiple | ✅ | ✅ |
 | **xAI Grok Imagine** | ✅ | ⚠️ Limited | ✅ | ✅ |
 | **Zhipu GLM-Image** | ✅ | — | ✅ | ✅ |
-| **Local ComfyUI** | ✅ | ✅ Single | — | — |
+| **Local ComfyUI** | ✅ | ✅ Multiple | — | — |
 | **ChatGPT subscription (key-free)** | ✅ | ✅ Multiple | ✅ | ✅ |
 | **Grok subscription (key-free)** | ✅ | ✅ Multiple | ✅ | ✅ |
 | **Google subscription (key-free)** | ✅ | ✅ Multiple | ✅ | ✅ |
@@ -366,7 +366,7 @@ When “Save to workspace” is enabled, chat results are saved to the `dsh-imag
 <details>
 <summary><strong>Why is ComfyUI not available in Studio?</strong></summary>
 
-Studio and multi-model comparison currently support cloud Providers only; ComfyUI is not yet integrated. ComfyUI supports text-to-image, single-image editing, and multiple named workflows through Agent chat.
+Studio and multi-model comparison currently support cloud Providers only; ComfyUI is not yet integrated. ComfyUI supports text-to-image, ordered-reference editing, and multiple named workflows through Agent chat.
 
 </details>
 
@@ -417,4 +417,8 @@ If `dsh-image-gen` improves your workflow, consider giving the project a ⭐ **S
 
 </div>
 
-ComfyUI chat automatically selects a workflow compatible with the operation. New images use a workflow without a reference-image input; edits use one with exactly one `{{image}}` input. The active compatible workflow takes priority, followed by import order. Explicit workflow names remain authoritative.
+ComfyUI chat automatically selects a workflow compatible with the operation. New images use a workflow without a reference-image input; edits use a workflow with reference-image inputs. A single-reference Qwen Image 2.1 workflow can expand its image group; other multi-reference workflows need numbered placeholders. The active compatible workflow takes priority, followed by import order. Explicit workflow names remain authoritative.
+
+### Ordered ComfyUI references
+
+Edits accept ordered conversation attachments through source_attachment_ids. Keep the customer photo first and explain each reference's role in the prompt. Qwen Image 2.1 workflows with one TextEncodeQwenImage21 encoder and an image_1 connection automatically expand to additional image connections. Other workflows require distinct, contiguous {{image}}, {{image_2}}, ... placeholders in LoadImage inputs. Duplicate, missing or unsupported reference slots fail before upload; no references are discarded. Imports and cloud provider behavior retain their existing limits.

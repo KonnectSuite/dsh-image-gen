@@ -419,9 +419,6 @@ export function apply(ctx: Context, config: Config = {}): void {
         })
 
       if (active.provider === 'comfyui') {
-        if (sourceImages.length > 1) {
-          throw new Error(`ComfyUI edit_image supports exactly one source image per call; this call resolved ${String(sourceImages.length)} images. Call edit_image again with source_attachment_id set to the single attachment ID of the image to edit.`)
-        }
         const sourceImage = sourceImages[0]
         if (sourceImage === undefined) throw new Error('edit_image requires a reference image')
         const workflow = selectComfyUIWorkflow(active, args.workflow, 'edit')
@@ -430,6 +427,7 @@ export function apply(ctx: Context, config: Config = {}): void {
           workflowJson: workflow.json,
           prompt: mergeComfyUIPrompt(workflow.presetPrompt, args.prompt),
           sourceImage: { data: sourceImage.data, mediaType: sourceImage.mediaType },
+          sourceImages,
           timeoutMs: active.timeoutMs,
           maxBytes: ctx.attachments.imageLimits.maxImageBytes,
           signal: exec.signal,

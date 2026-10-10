@@ -278,7 +278,7 @@ pnpm dsh plugin --profile web add ./dsh-image-gen
 | **Aliyun DashScope / Qwen Image** |    ✅    | ✅ 多图  |   ✅   |     ✅     |
 | **xAI Grok Imagine**              |    ✅    | ⚠️ 有限  |   ✅   |     ✅     |
 | **智谱 GLM-Image**                |    ✅    |    —     |   ✅   |     ✅     |
-| **Local ComfyUI**                 |    ✅    | ✅ 单图  |   —    |     —      |
+| **Local ComfyUI**                 |    ✅    | ✅ 多图  |   —    |     —      |
 | **ChatGPT 订阅（免 Key）**       |    ✅    | ✅ 多图  |   ✅   |     ✅     |
 | **Grok 订阅（免 Key）**          |    ✅    | ✅ 多图  |   ✅   |     ✅     |
 | **Google 订阅（免 Key）**        |    ✅    | ✅ 多图  |   ✅   |     ✅     |
@@ -366,7 +366,7 @@ dsh --profile web --dump-config
 <details>
 <summary><strong>为什么 ComfyUI 没有出现在 Studio 中？</strong></summary>
 
-当前 Studio 与多模型对比仅支持云端 Provider，暂未接入 ComfyUI。ComfyUI 已支持在 Agent 对话中进行文生图、单图编辑以及多个命名工作流。
+当前 Studio 与多模型对比仅支持云端 Provider，暂未接入 ComfyUI。ComfyUI 已支持在 Agent 对话中进行文生图、有序参考编辑以及多个命名工作流。
 
 </details>
 
@@ -417,4 +417,8 @@ pnpm run pack:check
 
 </div>
 
-ComfyUI 聊天会按操作自动选择兼容的工作流：生成新图使用不带参考图输入的工作流，编辑使用包含一个 `{{image}}` 输入的工作流。优先使用兼容的当前工作流，其次按导入顺序选择；明确指定的工作流名称仍优先。
+ComfyUI 聊天会按操作自动选择兼容的工作流：生成新图使用不带参考图输入的工作流，编辑使用带参考图像输入的工作流。单参考 Qwen Image 2.1 工作流可以扩展图像组；其他多参考工作流需要编号占位符。优先使用兼容的当前工作流，其次按导入顺序选择；明确指定的工作流名称仍优先。
+
+### 有序 ComfyUI 参考图像
+
+编辑通过 source_attachment_ids 接收有序的会话附件。客户照片应放在第一位，并在提示词中说明每张参考图像的用途。带有一个 TextEncodeQwenImage21 编码器及 image_1 连接的 Qwen Image 2.1 工作流会自动扩展额外的图像连接。其他工作流须在 LoadImage 输入中提供不同且连续的 {{image}}、{{image_2}} 等占位符。重复、缺失或不受支持的参考槽位会在上传前报错，不会丢弃任何参考图像。导入与云端提供方保留原有的限制。
