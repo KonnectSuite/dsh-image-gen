@@ -1,0 +1,6 @@
+{
+  "meta": {
+    "title": "Image Generation",
+    "description": "ChatGPT-like image generation through Gemini, OpenAI, Seedream, DashScope and local ComfyUI."
+  }
+}

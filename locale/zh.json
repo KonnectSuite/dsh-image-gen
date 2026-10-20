@@ -1,0 +1,6 @@
+{
+  "meta": {
+    "title": "图像生成",
+    "description": "通过 Gemini、OpenAI、Seedream、DashScope 与本地 ComfyUI 进行图像生成。"
+  }
+}
